@@ -41,7 +41,7 @@ const Component = () => {
   return <main>{renderContent()}</main>;
 };
 
-const Page = () => {
+const Page = withAuth(() => {
   return (
     <div>
       <Suspense>
@@ -49,6 +49,6 @@ const Page = () => {
       </Suspense>
     </div>
   );
-};
+});
 
-export default withAuth(Page);
+export default Page;
