@@ -3,25 +3,42 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "NODE_ENV=development next dev",
+    "prod": "NODE_ENV=production yarn build",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@nextui-org/button": "^2.0.34",
+    "@nextui-org/input": "^2.2.2",
+    "@nextui-org/system": "^2.2.2",
+    "@nextui-org/theme": "^2.2.6",
+    "@reduxjs/toolkit": "^2.2.5",
+    "axios": "^1.6.8",
+    "date-fns": "^3.6.0",
+    "framer-motion": "^11.3.6",
+    "i18next": "^23.11.4",
+    "js-cookie": "^3.0.5",
     "next": "14.2.5",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-i18next": "^14.1.1",
+    "react-icons": "^5.0.1",
+    "react-native-dotenv": "3.4.11",
+    "sharp": "^0.33.3"
   },
   "devDependencies": {
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.5",
     "postcss": "^8",
+    "prettier": "2.8.8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "5.0.4"
   },
   "packageManager": "yarn@4.1.1+sha512.ec40d0639bb307441b945d9467139cbb88d14394baac760b52eca038b330d16542d66fef61574271534ace5a200518dabf3b53a85f1f9e4bfa37141b538a9590"
 }
