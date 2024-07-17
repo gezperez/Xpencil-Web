@@ -5,13 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { ApiBase } from '@/api';
 import AuthApi from '@/api/auth';
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  Button,
-  Input,
-} from '@nextui-org/react';
+import { Button, Input } from '@nextui-org/react';
 
 const Component = () => {
   const [email, setEmail] = useState<string | undefined>(undefined);
@@ -47,7 +41,7 @@ const Component = () => {
             return router.push(`${returnUrl}`);
           }
 
-          return router.push('/home');
+          return router.push('/account');
         }
       }
     } catch (error: any) {
@@ -60,14 +54,6 @@ const Component = () => {
       return setError('Unknown Error');
     }
   };
-
-  const content = (
-    <PopoverContent>
-      <div className="px-1 py-2">
-        <div className="text-tiny">{error}</div>
-      </div>
-    </PopoverContent>
-  );
 
   const renderContent = () => (
     <div className="flex bg-white justify-center items-center">
@@ -93,24 +79,17 @@ const Component = () => {
           size="lg"
           className="mb-6"
         />
-        <Popover
-          placement={'bottom'}
-          color="danger"
+        <Button
+          size="lg"
+          radius="full"
+          className="bg-primary text-onPrimary"
+          isLoading={isLoading}
+          isDisabled={!email || !password}
+          onClick={handleLoginPress}
         >
-          <PopoverTrigger>
-            <Button
-              size="lg"
-              radius="full"
-              className="bg-primary text-onPrimary"
-              isLoading={isLoading}
-              isDisabled={!email || !password}
-              onClick={handleLoginPress}
-            >
-              Continue
-            </Button>
-          </PopoverTrigger>
-          {content}
-        </Popover>
+          Continue
+        </Button>
+        <div className="font-semibold mt-4 text-sm text-danger">{error}</div>
       </div>
     </div>
   );

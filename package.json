@@ -10,11 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@nextui-org/button": "^2.0.34",
-    "@nextui-org/input": "^2.2.2",
-    "@nextui-org/system": "^2.2.2",
-    "@nextui-org/tabs": "^2.0.32",
-    "@nextui-org/theme": "^2.2.6",
+    "@nextui-org/react": "^2.4.3",
     "@reduxjs/toolkit": "^2.2.5",
     "axios": "^1.6.8",
     "date-fns": "^3.6.0",
