@@ -87,9 +87,9 @@ const Component = () => {
           isDisabled={!email || !password}
           onClick={handleLoginPress}
         >
-          Continue
+          Log In
         </Button>
-        <div className="font-semibold mt-4 text-sm text-danger">{error}</div>
+        <div className="font-semibold mt-5 text-sm text-danger">{error}</div>
       </div>
     </div>
   );
