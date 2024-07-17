@@ -1,15 +1,9 @@
 import { ApiBase } from '@/api';
 import { useRouter, usePathname } from 'next/navigation';
-import { useEffect, ComponentType } from 'react';
+import { useEffect } from 'react';
 
-type WithAuthProps = {
-  [key: string]: any;
-};
-
-const withAuth = <P extends WithAuthProps>(
-  WrappedComponent: ComponentType<P>,
-): ComponentType<P> => {
-  const AuthComponent = (props: P) => {
+const withAuth = (WrappedComponent: any) => {
+  const AuthComponent = (props: any) => {
     const router = useRouter();
 
     const pathname = usePathname();
