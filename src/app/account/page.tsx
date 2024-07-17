@@ -1,42 +1,96 @@
 'use client';
 
-import { Suspense, useState } from 'react';
-import { Input } from '@nextui-org/input';
+import { Suspense, useEffect, useState } from 'react';
 import { Button } from '@nextui-org/button';
-import AuthApi from '@/api/auth';
 import { withAuth } from '@/hocs';
+import UserApi from '@/api/user';
+import { ApiBase } from '@/api';
+import { User } from '@/types';
 
 const Component = () => {
-  const [email, setEmail] = useState<string | undefined>(undefined);
-  const [password, setPassword] = useState<string | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isButtonLoading, setIsButtonLoading] = useState<boolean>(false);
 
-  const handleLoginPress = async () => {
+  const [user, setUser] = useState<User | undefined>(undefined);
+
+  const [showMessage, setShowMessage] = useState(false);
+
+  const userId = ApiBase.getUserId();
+
+  const fetchUser = async () => {
     try {
-      if (email && password) {
-        setIsLoading(true);
+      if (userId) {
+        const response = await UserApi.getUser(+userId);
 
-        await AuthApi.loginUser({
-          email,
-          password,
-        });
-
-        setIsLoading(false);
+        setUser(response.data);
       }
     } catch {
-      setIsLoading(false);
+      ApiBase.removeTokens();
     }
   };
 
-  const renderContent = () => (
-    <div className="flex bg-white justify-center items-center">
-      <div className="w-1/3 flex flex-col h-screen justify-center items-center">
-        <div className="font-semibold mb-4 text-lg text-onBackground">
-          Account
+  const handleCloseAccountPress = async () => {
+    try {
+      setIsButtonLoading(true);
+
+      if (userId) {
+        await UserApi.deleteUser(+userId);
+
+        ApiBase.removeTokens();
+      }
+
+      setShowMessage(true);
+
+      setIsButtonLoading(false);
+    } catch {
+      setIsButtonLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  const renderContent = () => {
+    if (!user) {
+      return null;
+    }
+
+    if (showMessage) {
+      return (
+        <div className="flex bg-white justify-center items-center">
+          <div className="w-1/3 flex flex-col h-screen justify-center items-center">
+            <div className="flex flex-col font-semibold mb-4 text-lg text-onBackground bg-background p-6 rounded-lg justify-center items-center">
+              <div className="text-lg text-center">
+                Your Xpencil Account has been closed
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex bg-white justify-center items-center">
+        <div className="w-1/3 flex flex-col h-screen justify-center items-center">
+          <div className="flex flex-col font-semibold mb-4 text-lg text-onBackground bg-background p-6 rounded-lg justify-center items-center">
+            <div className="mb-5 text-2xl text-center">
+              Close Xpencil Account
+            </div>
+            <div className="mb-5 text-small text-center">{`Dear ${user?.name}, if you close your account, all of your user information will be deleted from our database`}</div>
+            <Button
+              size="lg"
+              radius="full"
+              className="bg-danger text-onPrimary"
+              isLoading={isButtonLoading}
+              onClick={handleCloseAccountPress}
+            >
+              Close Account
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return <main>{renderContent()}</main>;
 };

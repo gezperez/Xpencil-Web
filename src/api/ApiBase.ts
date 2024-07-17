@@ -29,16 +29,12 @@ class ApiBase {
 
   static retryCounter: number = 0;
 
-  constructor() {
-    ApiBase.initInterceptors();
-  }
-
   getBaseUrl = () => {
     return process.env.NEXT_PUBLIC_BASE_URL;
   };
 
   static setRefreshToken = (token: string) => {
-    return Cookies.set('refreshToken', token, { expires: 7 });
+    return Cookies.set('refreshToken', token, { expires: 1 });
   };
 
   static getRefreshToken = () => {
@@ -50,16 +46,24 @@ class ApiBase {
   };
 
   static setAccessToken = (token: string) => {
-    return Cookies.set('accessToken', token, { expires: 7 });
+    return Cookies.set('accessToken', token, { expires: 1 });
   };
 
   static getAccessToken = () => {
     return Cookies.get('accessToken');
   };
 
+  static setUserId = (userId: number) => {
+    return Cookies.set('userId', userId.toString(), { expires: 1 });
+  };
+
+  static getUserId = () => {
+    return Cookies.get('userId');
+  };
+
   static removeTokens = () => {
     Cookies.remove('refreshToken');
-    return Cookies.remove('accessToken');
+    Cookies.remove('accessToken');
   };
 
   static handleRevokeSession = async () => {
@@ -71,73 +75,6 @@ class ApiBase {
     } catch (error) {
       console.error('Error handling refresh token failure:', error);
     }
-  };
-
-  static tokenInterceptor = async (error: AxiosError & ApiError) => {
-    const originalRequest = error.config;
-
-    if (
-      error.statusCode === HttpStatusCode.Unauthorized &&
-      this.retryCounter < MAX_RETRY_COUNT
-    ) {
-      try {
-        this.retryCounter += 1;
-
-        const refreshToken = this.getRefreshToken();
-
-        const newAccessToken = await AuthApi.refreshToken(refreshToken);
-
-        this.setAccessToken(newAccessToken.data.accessToken);
-
-        if (originalRequest) {
-          originalRequest.headers.Authorization = `Bearer ${newAccessToken.data.accessToken}`;
-          return axios(originalRequest);
-        }
-
-        return Promise.reject(error);
-      } catch (e) {
-        throw e;
-      }
-    }
-
-    if (this.retryCounter >= MAX_RETRY_COUNT) {
-      return this.handleRevokeSession();
-    }
-
-    return Promise.reject(error);
-  };
-
-  static errorInterceptor = (
-    error: AxiosError<ApiError>,
-  ): Promise<AxiosError & ApiError> => {
-    if (error.response) {
-      let message = '';
-
-      if (error?.response?.data?.message) {
-        if (Array.isArray(error.response.data.message)) {
-          message = error.response.data.message.join('\n');
-        } else {
-          message = error?.response?.data?.message;
-        }
-      }
-
-      const customError = {
-        ...error,
-        statusCode: error.response.data.statusCode,
-        message,
-      };
-
-      return Promise.reject(customError);
-    }
-
-    return Promise.reject(error);
-  };
-
-  static initInterceptors = () => {
-    axiosInstance.interceptors.response.use(
-      (response) => response,
-      (error) => this.errorInterceptor(error).catch(this.tokenInterceptor),
-    );
   };
 
   call = async (url: string, options: RequestOptions = {}) => {

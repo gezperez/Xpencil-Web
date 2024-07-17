@@ -10,11 +10,12 @@ const withAuth = (WrappedComponent: any) => {
 
     useEffect(() => {
       const accessToken = ApiBase.getAccessToken();
+
       if (!accessToken) {
         // If not authenticated, redirect to login page with the original destination URL
         router.replace(`/login?returnUrl=${pathname}`);
       }
-    }, []);
+    }, [pathname, router]);
 
     return <WrappedComponent {...props} />;
   };

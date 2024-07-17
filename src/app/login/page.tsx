@@ -1,17 +1,23 @@
 'use client';
 
 import { Suspense, useState } from 'react';
-import { Input } from '@nextui-org/input';
-import { Button } from '@nextui-org/button';
-import AuthApi from '@/api/auth';
-import { ApiBase } from '@/api';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
+import { ApiBase } from '@/api';
+import AuthApi from '@/api/auth';
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  Button,
+  Input,
+} from '@nextui-org/react';
 
 const Component = () => {
   const [email, setEmail] = useState<string | undefined>(undefined);
   const [password, setPassword] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | undefined>();
 
   const router = useRouter();
 
@@ -30,10 +36,11 @@ const Component = () => {
         });
 
         if (response.data) {
-          const { accessToken, refreshToken } = response.data;
+          const { accessToken, refreshToken, id } = response.data;
 
           ApiBase.setAccessToken(accessToken);
           ApiBase.setRefreshToken(refreshToken);
+          ApiBase.setUserId(id);
           setIsLoading(false);
 
           if (returnUrl) {
@@ -43,10 +50,24 @@ const Component = () => {
           return router.push('/home');
         }
       }
-    } catch {
+    } catch (error: any) {
       setIsLoading(false);
+
+      if (error?.response?.data?.statusCode) {
+        return setError(error?.response?.data?.message);
+      }
+
+      return setError('Unknown Error');
     }
   };
+
+  const content = (
+    <PopoverContent>
+      <div className="px-1 py-2">
+        <div className="text-tiny">{error}</div>
+      </div>
+    </PopoverContent>
+  );
 
   const renderContent = () => (
     <div className="flex bg-white justify-center items-center">
@@ -72,15 +93,24 @@ const Component = () => {
           size="lg"
           className="mb-6"
         />
-        <Button
-          size="lg"
-          radius="full"
-          className="bg-primary text-onPrimary"
-          isLoading={isLoading}
-          onClick={handleLoginPress}
+        <Popover
+          placement={'bottom'}
+          color="danger"
         >
-          Continue
-        </Button>
+          <PopoverTrigger>
+            <Button
+              size="lg"
+              radius="full"
+              className="bg-primary text-onPrimary"
+              isLoading={isLoading}
+              isDisabled={!email || !password}
+              onClick={handleLoginPress}
+            >
+              Continue
+            </Button>
+          </PopoverTrigger>
+          {content}
+        </Popover>
       </div>
     </div>
   );
